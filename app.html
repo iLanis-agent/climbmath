@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClimbMath - calculator</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #171310; color: #f4ede4; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+  main { max-width: 740px; padding: 32px 20px 48px; width: 100%; box-sizing: border-box; }
+  h1 { font-size: 1.9rem; margin: 0 0 4px; }
+  p.sub { color: #d8c9b6; margin: 0 0 20px; }
+  .card { background: #1f1a15; border: 1px solid #3d3226; border-radius: 12px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 1.05rem; color: #ecd9bd; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
+  label { display: block; color: #c2b29c; font-size: 0.82rem; margin-bottom: 4px; }
+  input, select { width: 100%; box-sizing: border-box; background: #171310; border: 1px solid #4a3d2c; color: #f4ede4; border-radius: 8px; padding: 9px 10px; font-size: 0.95rem; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .presets button { background: #2a231b; color: #e8dcc8; border: 1px solid #4a3d2c; border-radius: 999px; padding: 7px 14px; font-size: 0.85rem; cursor: pointer; }
+  .presets button:hover { background: #3d3226; }
+  .out { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .metric { background: #171310; border: 1px solid #3d3226; border-radius: 10px; padding: 12px 14px; }
+  .metric .v { font-size: 1.3rem; font-weight: 700; color: #e8843c; }
+  .metric .k { color: #c2b29c; font-size: 0.78rem; margin-top: 2px; }
+  .note { color: #a8977d; font-size: 0.82rem; line-height: 1.5; margin-top: 10px; }
+  a.back { color: #e8843c; font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>&#129495; ClimbMath</h1>
+  <p class="sub">Grades, falls, rope, draws. The numbers behind the spray.</p>
+  <div class="presets">
+    <button data-p="sport">Sport trip to Spain</button>
+    <button data-p="gym">Gym boulderer</button>
+    <button data-p="whip">Big whip question</button>
+    <button data-p="proj">Projecting 5.12a</button>
+  </div>
+  <div class="card">
+    <h2>1. Grade converter</h2>
+    <div class="grid">
+      <div><label>Grade in any system (7a = French, 6C = Font, V4, 5.12a, VIII)</label><input id="grade" type="text" value="7a"></div>
+    </div>
+    <div class="out" style="margin-top:12px">
+      <div class="metric"><div class="v" id="o-yds">-</div><div class="k">YDS</div></div>
+      <div class="metric"><div class="v" id="o-fr">-</div><div class="k">French sport</div></div>
+      <div class="metric"><div class="v" id="o-uiaa">-</div><div class="k">UIAA</div></div>
+      <div class="metric"><div class="v" id="o-v">-</div><div class="k">Hueco (V) / Font</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>2. Fall factor</h2>
+    <div class="grid">
+      <div><label>Fall length (m)</label><input id="fallM" type="number" value="6" min="0" step="0.5"></div>
+      <div><label>Rope in service (m)</label><input id="ropeM" type="number" value="10" min="0" step="0.5"></div>
+    </div>
+    <div class="out" style="margin-top:12px">
+      <div class="metric"><div class="v" id="o-ff">-</div><div class="k">Fall factor</div></div>
+      <div class="metric"><div class="v" id="o-ffv">-</div><div class="k">What it means</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>3. Rope and draws</h2>
+    <div class="grid">
+      <div><label>Route height (m)</label><input id="routeM" type="number" value="25" min="3"></div>
+      <div><label>Bolt count (not counting anchor)</label><input id="bolts" type="number" value="10" min="0"></div>
+    </div>
+    <div class="out" style="margin-top:12px">
+      <div class="metric"><div class="v" id="o-rope">-</div><div class="k">Minimum rope (2x + 5m margin)</div></div>
+      <div class="metric"><div class="v" id="o-draws">-</div><div class="k">Quickdraws (anchor + 2 spares)</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>4. Project and session</h2>
+    <div class="grid">
+      <div><label>Project grade</label><input id="proj" type="text" value="5.12a"></div>
+      <div><label>Your weight (kg)</label><input id="kg" type="number" value="70" min="35"></div>
+      <div><label>Session length (min)</label><input id="mins" type="number" value="120" min="0"></div>
+      <div><label>Style</label><select id="style"><option value="roped" selected>Roped</option><option value="bouldering">Bouldering</option></select></div>
+    </div>
+    <div class="out" style="margin-top:12px">
+      <div class="metric"><div class="v" id="o-pyr">-</div><div class="k">Redpoint base needed</div></div>
+      <div class="metric"><div class="v" id="o-kcal">-</div><div class="k">Session calories</div></div>
+    </div>
+    <p class="note" id="o-note"></p>
+  </div>
+  <p class="note">Grade rungs follow standard published conversion charts; any given climb disagrees with all of them. Fall factor assumes a dynamic rope and a belayer who is paying attention.</p>
+  <p><a class="back" href="index.html">&larr; Back to ClimbMath</a></p>
+</main>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var ids = ['grade','fallM','ropeM','routeM','bolts','proj','kg','mins','style'];
+  function num(id) { var v = parseFloat(document.getElementById(id).value); return isFinite(v) ? v : 0; }
+  function compute() {
+    if (typeof ClimbMath === 'undefined') return;
+    var conv = ClimbMath.convertGrade(document.getElementById('grade').value);
+    document.getElementById('o-yds').textContent = conv ? conv.yds : 'unknown grade';
+    document.getElementById('o-fr').textContent = conv ? conv.fr : '-';
+    document.getElementById('o-uiaa').textContent = conv ? conv.uiaa : '-';
+    document.getElementById('o-v').textContent = conv ? (conv.v + ' / ' + conv.font) : '-';
+
+    var ff = ClimbMath.fallFactor(num('fallM'), num('ropeM'));
+    document.getElementById('o-ff').textContent = ff === null ? '-' : ff.toFixed(2);
+    document.getElementById('o-ffv').textContent = ClimbMath.fallVerdict(ff);
+
+    document.getElementById('o-rope').textContent = ClimbMath.ropeNeeded(num('routeM')) + ' m';
+    document.getElementById('o-draws').textContent = ClimbMath.drawsNeeded(Math.round(num('bolts')));
+
+    var proj = ClimbMath.findRung(document.getElementById('proj').value);
+    var pyr = proj ? ClimbMath.pyramid(proj.index) : [];
+    document.getElementById('o-pyr').textContent = pyr.length
+      ? pyr.map(function (r) { return r.sends + 'x ' + r.yds; }).join(', ')
+      : 'unknown grade';
+    document.getElementById('o-kcal').textContent = ClimbMath.sessionCalories(num('mins'), num('kg'), document.getElementById('style').value).toLocaleString() + ' kcal';
+    document.getElementById('o-note').textContent = proj
+      ? 'A ' + proj.rung.yds + ' (' + proj.rung.fr + ') project stands on a base of ' + (pyr[0] ? pyr[0].sends + ' sends at ' + pyr[0].yds : 'nothing - pick a harder ladder') + '. Skipping rungs is how fingers get tweaky.'
+      : 'Enter a project grade to see the pyramid under it.';
+  }
+  var presets = {
+    sport: {grade:'7a', fallM:6, ropeM:20, routeM:28, bolts:12, proj:'7a+', kg:70, mins:180, style:'roped'},
+    gym: {grade:'V4', fallM:2, ropeM:10, routeM:4, bolts:0, proj:'V5', kg:78, mins:90, style:'bouldering'},
+    whip: {grade:'5.10d', fallM:8, ropeM:12, routeM:30, bolts:10, proj:'5.11b', kg:70, mins:120, style:'roped'},
+    proj: {grade:'7b', fallM:4, ropeM:25, routeM:25, bolts:11, proj:'5.12a', kg:66, mins:150, style:'roped'}
+  };
+  Array.prototype.forEach.call(document.querySelectorAll('.presets button'), function (b) {
+    b.addEventListener('click', function () {
+      var p = presets[b.getAttribute('data-p')];
+      if (!p) return;
+      Object.keys(p).forEach(function (k) { document.getElementById(k).value = p[k]; });
+      compute();
+    });
+  });
+  ids.forEach(function (id) {
+    document.getElementById(id).addEventListener('input', compute);
+    document.getElementById(id).addEventListener('change', compute);
+  });
+  compute();
+})();
+</script>
+</body>
+</html>
